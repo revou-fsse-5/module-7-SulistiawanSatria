@@ -1,0 +1,45 @@
+# Dependencies
+__pychace__
+vendor/
+
+# Build outputs
+dist/
+build/
+out/
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+
+# Operating System
+Thumbs.db
+.DS_Store
+*.tmp
+
+# Optional: Package manager files
+yarn.lock
+package-lock.json
+
+alembic.ini
+script.py.mako
+env.py
+609036d6fc38_initial_migration.py
+venv
+pyvenv

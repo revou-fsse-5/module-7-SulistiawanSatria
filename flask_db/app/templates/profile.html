@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Profile</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Information</h5>
+                    <p>Username: {{ current_user.username }}</p>
+                    <p>Email: {{ current_user.email }}</p>
+                    <p>Role: {{ current_user.role }}</p>
+                </div>
+            </div>
+
+            {% if current_user.role == 'Admin' %}
+            <div class="mt-4">
+                <h3>Admin Actions</h3>
+                <a href="{{ url_for('review.get_reviews') }}" class="btn btn-primary">View All Reviews</a>
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <h3>Your Reviews</h3>
+                <div id="userReviews">
+                    <!-- Reviews will be loaded here dynamically -->
+                </div>
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#createReviewModal">
+                    Create New Review
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Review Modal -->
+<div class="modal fade" id="createReviewModal" tabindex="-1" aria-labelledby="createReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createReviewModalLabel">Create New Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <div class="mb-3">
+                        <label for="productId" class="form-label">Product ID</label>
+                        <input type="number" class="form-control" id="productId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating (1-5)</label>
+                        <input type="number" class="form-control" id="rating" min="1" max="5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this at the bottom of profile.html -->
+<script>
+function submitReview() {
+    const productId = document.getElementById('productId').value;
+    const rating = document.getElementById('rating').value;
+    const description = document.getElementById('description').value;
+
+    fetch('/review', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            product_id: parseInt(productId),
+            rating: parseInt(rating),
+            description: description
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === "Review created successfully") {
+            alert('Review submitted successfully!');
+            location.reload();
+        } else {
+            alert('Error creating review: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting review');
+    });
+}
+
+// Load user's reviews when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserReviews();
+});
+
+function loadUserReviews() {
+    fetch('/reviews')
+        .then(response => response.json())
+        .then(data => {
+            const reviewsDiv = document.getElementById('userReviews');
+            if (data.length === 0) {
+                reviewsDiv.innerHTML = '<p>No reviews yet.</p>';
+                return;
+            }
+
+            const reviewsHTML = data.map(review => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Product ID: ${review.product_id}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Rating: ${review.rating}/5</h6>
+                        <p class="card-text">${review.description}</p>
+                        <small class="text-muted">Created: ${review.created_at}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            reviewsDiv.innerHTML = reviewsHTML;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('userReviews').innerHTML = '<p>Error loading reviews.</p>';
+        });
+}
+</script>
+{% endblock %}

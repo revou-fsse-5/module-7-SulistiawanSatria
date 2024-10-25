@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">Welcome to API App</h1>
+            
+            {% if current_user.is_authenticated %}
+                <div class="alert alert-success">
+                    <h4>Hello, {{ current_user.username }}!</h4>
+                    <p>You are logged in as: {{ current_user.role }}</p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-primary me-2">View Profile</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>Please login to access more features</p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-success">Register</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
