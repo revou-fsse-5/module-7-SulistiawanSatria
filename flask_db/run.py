@@ -1,5 +1,5 @@
 from app import create_app
-from app.connectors.db import create_tables
+from app.connectors.db import create_tables, db
 
 app = create_app()
 
